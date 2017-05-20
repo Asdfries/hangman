@@ -1,5 +1,4 @@
-
-def game_word
+def game_word ###this uses a lists of words from a file and picks a word with an acceptible length ###
   wordbank = []
   textbase = File.readlines "wordbank/5desk.txt"
   textbase.each do |word|
@@ -7,8 +6,10 @@ def game_word
       wordbank << word
     end
   end
-  wordbank[rand(wordbank.length)]
+  wordbank[rand(wordbank.length)] 
 end
 
+def save_game ## this saves the current state of the game ###
 
-puts game_word
+end
+
