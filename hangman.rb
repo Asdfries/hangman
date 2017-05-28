@@ -1,7 +1,8 @@
+require 'json'
+
 class Hangman
   
   def initialize
-    @@current_word
     @@letters_left = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
     @@gallow_count = 0
     @@current_word_hidden = String.new
@@ -9,12 +10,12 @@ class Hangman
 
 ###This is the opening sequence for each game###
   def open_sequence
-    display =  "   --------^ \n   |       | \n   O       | \n  /|\\      |   / \\      | \n           | \n __________|__"
+    display =  "   --------^ \n   |       | \n   O       | \n  /|\\      |\n  / \\      | \n           | \n __________|__"
     puts display
     puts "Welcome to Hangman!!! \nThe goal of the game here is to guess the secret word one letter at a time.\nEach mistake brings you closer to hanging our poor friend Disonoris Kagelbon. \nBegin by typing 'new', or open an existing game with 'open' " 
     decision = gets.chomp
-    if decision = new
-      new_game
+    if decision == "new"
+      game_play
     elsif decision = open
     
     end
@@ -34,7 +35,14 @@ class Hangman
   
 ### this saves the current state of the game ###
   def save_game 
-
+    def to_json
+      JSON.dump({
+        :letters_left => @@letters_left
+        :gallow_count => @@gallow_count
+        :current_word_hidden => @@current_word_hidden
+        
+      })
+    end
   end
 
 ### this shows the current state of the gallows with the hangman on it ###
@@ -42,6 +50,7 @@ class Hangman
     IO.readlines("gallows.txt")[(@@gallow_count * 7)..(@@gallow_count * 7) + 6]
   end
 
+###This takes input from the player and checks if its a right or wrong guess###
   def player_turn
     puts gallows
     puts @@letters_left
@@ -58,11 +67,7 @@ class Hangman
       @@gallow_count += 1
     end 
   end 
-
-  def game_status
   
-  end 
-
 ###This resets the variables for a new game and assigns a new word to play with###
   def new_game
     @@current_word = game_word.upcase!
@@ -70,22 +75,31 @@ class Hangman
       @@current_word_hidden << "-"
     end 
     @@gallow_count = 0
-    @@letters_left = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+    @letters_left = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
   end
-  
+
+###checks to see if the player has lost by seeing how many wrong guesses have been made###  
   def game_over_check
     if @@gallow_count >= 6
-      return "GAME OVER"
+      return true
     end
   end 
-  
+
+###iterates through the steps of taking turns and checking for win/loss ###  
   def game_play
     new_game
     while @@current_word_hidden.include? "-"
       player_turn
-      game_over_check
+      unless @@current_word_hidden.include? "-"
+        puts @@current_word 
+        puts "You Win"
+      end
+      if game_over_check
+        puts "Game over.  You lose. The word was #{@@current_word}"
+        @@current_word_hidden = @@current_word
+      end
     end
   end 
 end
 alpha = Hangman.new
-alpha.game_play
+alpha.open_sequence
